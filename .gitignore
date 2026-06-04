@@ -1,0 +1,20 @@
+# Build artifacts
+_build/
+*.o
+*.d
+*.out
+*.map
+*.hex
+*.bin
+
+# IDE/session files
+*.emSession
+*.uvoptx
+*.dep
+
+# Local SDK copies
+nRF5_SDK*/
+sdk/
+
+# Logs
+*.log
