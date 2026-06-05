@@ -14,14 +14,22 @@
 
 ### 当前阶段
 
-- 第 1 关：准备编译亮灯工程
+- 第 1 关：亮灯工程已编译通过
+- 第 2 关：准备连接 ARM V12/J-Link 和 EWT73 SWD
 
 ### 下一步
 
-1. 打开 `examples\peripheral\blinky\pca10040e\blank\ses\blinky_pca10040e.emProject`
-2. 执行 `Build -> Clean Solution`
-3. 执行 `Build -> Build Solution`
-4. 把完整 Output 复制到 `docs/troubleshooting.md`，不要只记录 AI 总结
+1. 在 SEGGER Embedded Studio 中打开 `examples\peripheral\blinky\pca10040e\blank\ses\blinky_pca10040e.emProject`
+2. ARM V12/J-Link 接 EWT73 的 `3V3/GND/SWDIO/SWCLK`
+3. 执行 `Target -> Connect J-Link`
+4. 如果连接成功，再执行 `Target -> Download blinky_pca10040e`
+5. 如果连接失败，把完整 Target Output 复制到 `docs/troubleshooting.md`
+
+### Solution 状态
+
+- 当前使用 Nordic SDK 官方 solution：`blinky_pca10040e.emProject`
+- 当前仓库还没有自己的 `location_tracker_nrf52810.emProject`
+- 等第 2、3 关跑通后，再从 `ble_app_uart_pca10040e_s112.emProject` 建立本项目自己的 solution
 
 ## 进度模板
 

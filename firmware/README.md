@@ -8,11 +8,25 @@
 nRF5_SDK_17.1.0_ddde560\examples\peripheral\blinky\pca10040e\blank
 ```
 
+SEGGER Embedded Studio 中要打开的 solution 文件是：
+
+```text
+nRF5_SDK_17.1.0_ddde560\examples\peripheral\blinky\pca10040e\blank\ses\blinky_pca10040e.emProject
+```
+
 BLE UART：
 
 ```text
 nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\pca10040e\s112
 ```
+
+SEGGER Embedded Studio 中要打开的 solution 文件是：
+
+```text
+nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\pca10040e\s112\ses\ble_app_uart_pca10040e_s112.emProject
+```
+
+注意：SEGGER Embedded Studio 使用 `.emProject` 作为工程/solution 文件，不是 Visual Studio 的 `.sln`。窗口标题显示 `blinky_pca10040e - SEGGER Embedded Studio` 时，说明已经打开了 `blinky_pca10040e` 这个 solution。
 
 ## 建议策略
 
@@ -24,7 +38,9 @@ nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\pca10040e\s112
 firmware/location_tracker_nrf52810/
 ```
 
-从 `ble_app_uart\pca10040e\s112` 复制最小工程，再逐步加入：
+从 `ble_app_uart\pca10040e\s112` 复制最小工程，再把工程内 SDK 相对路径调整为本机 SDK 路径或仓库约定的 SDK 路径。这个步骤会生成本项目自己的 SES solution，目前还没有做。
+
+后续在自己的 solution 中逐步加入：
 
 1. 自定义设备名
 2. 固定测试字符串发送
