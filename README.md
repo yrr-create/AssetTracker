@@ -15,6 +15,29 @@ Ebyte E73-2G4M04S1A / nRF52810 location prototype.
 
 注意：`pca10040e` 是 Nordic SDK 为 nRF52810 提供的示例配置，不代表本项目使用 Nordic PCA10040E 开发板。E73 是模块，LED、按键、GPS UART、供电和 SWD 都要按自己的底板接线确认。
 
+## 本地 SDK 准备
+
+本仓库不提交完整 Nordic SDK。别人克隆项目后，需要自己下载并解压：
+
+```text
+nRF5 SDK 17.1.0
+S112 SoftDevice v7.2.0
+```
+
+推荐把 SDK 固定放到仓库外的稳定目录：
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560
+```
+
+当前电脑已经可以使用这个路径。不要把工程长期指向 `C:\Users\Administrator\Documents\Codex\...` 下面的临时附件目录；那个目录只适合临时验证，不适合作为项目依赖。
+
+在 SEGGER Embedded Studio 中打开 blinky 时，完整路径应类似：
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\peripheral\blinky\pca10040e\blank\ses\blinky_pca10040e.emProject
+```
+
 ## 五关开发路线
 
 ### 第 1 关：编译通过

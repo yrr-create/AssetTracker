@@ -15,6 +15,7 @@ _build/
 # Local SDK copies
 nRF5_SDK*/
 sdk/
+NordicSDK/
 
 # Logs
 *.log

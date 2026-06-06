@@ -1,5 +1,17 @@
 # Firmware Notes
 
+## SDK 放置约定
+
+完整 Nordic SDK 不放进本仓库。仓库只记录版本、路径和本项目后续自己改出来的固件工程。
+
+推荐本机目录：
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560
+```
+
+如果换电脑开发，先下载并解压同版本 SDK 到上面的目录，或者放到自己的稳定目录后，在本文件和工程设置中同步记录。不要依赖 `C:\Users\Administrator\Documents\Codex\...` 这类临时目录。
+
 ## 基准工程
 
 亮灯/GPIO：
@@ -12,6 +24,12 @@ SEGGER Embedded Studio 中要打开的 solution 文件是：
 
 ```text
 nRF5_SDK_17.1.0_ddde560\examples\peripheral\blinky\pca10040e\blank\ses\blinky_pca10040e.emProject
+```
+
+当前电脑推荐直接打开：
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\peripheral\blinky\pca10040e\blank\ses\blinky_pca10040e.emProject
 ```
 
 BLE UART：
