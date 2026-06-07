@@ -10,7 +10,7 @@
 - 芯片方向：nRF52810
 - SDK 方向：nRF5 SDK + S112
 - 官方示例基准：`pca10040e`
-- 项目路线：先 blinky，再 BLE UART，再 GPS 坐标上报
+- 项目路线：先 blinky，再 BLE UART，再 BLE 仓库资产标签控制协议和 Android App
 
 ### 当前阶段
 
@@ -120,8 +120,43 @@ firmware\patches\ble-uart-send-hello-on-notify.patch
 
 ### 下一步
 
-- 将设备名从 `Nordic_UART` 改成项目名，例如 `LocationGET`。
-- 再做周期性发送测试字符串，为后续 GPS 坐标上报做准备。
+- 将设备名从 `Nordic_UART` 改成资产标签名，例如 `L4-001`。
+- 做 `FIND_ON` / `FIND_OFF` / `STATUS?`，为仓库资产查找功能做准备。
+
+### 项目方向调整：BLE 仓库资产标签
+
+经过第 4 关 BLE UART 验证后，项目主线从“GPS 坐标上报”调整为“BLE 仓库资产标签系统”。原因：
+
+- 当前 E73-2G4M04S1A / nRF52810 板子本身没有 GPS，继续发送经纬度只能是假数据。
+- BLE 标签更适合真实仓库资产管理：扫描附近标签、记录 RSSI、最后出现时间和区域，并通过声光提醒查找实物。
+- nRF Connect 只适合协议验证；真正的资产列表、最后出现记录、盘点和低电量提醒需要后续 Android App 实现。
+
+当前 MVP 硬件选择：
+
+```text
+P0.17: 状态 LED
+P0.18: 查找 LED
+板载按钮: 停止查找/确认，GPIO 待确认
+USB: 当前供电方式
+无源蜂鸣器: 已准备，后续用 PWM 驱动
+```
+
+下一周目标：
+
+```text
+手机 App 扫到 L4-001
+显示 RSSI 近/中/远
+点击进入资产详情
+点击查找后板子 LED 闪 + 蜂鸣器响
+点击停止或按板子按钮后停止
+App 能读取 STATUS 状态
+```
+
+已新增设计文档：
+
+```text
+docs\superpowers\specs\2026-06-07-ble-warehouse-asset-tag-mvp-design.md
+```
 
 ## 进度模板
 

@@ -62,10 +62,13 @@ firmware/location_tracker_nrf52810/
 
 1. 自定义设备名
 2. 固定测试字符串发送
-3. GPS UART 接收
-4. NMEA 行缓冲
-5. `$GPRMC` / `$GNRMC` 解析
-6. BLE UART 坐标发送
+3. `FIND_ON` / `FIND_OFF` 命令解析
+4. P0.17 / P0.18 查找灯控制
+5. `STATUS?` 状态返回
+6. 板载按钮停止查找
+7. 无源蜂鸣器 PWM 发声
+
+GPS 坐标上报暂时不作为主线。当前项目定位改为 BLE 仓库资产标签，位置由手机或网关扫描 RSSI、时间和区域记录推断。
 
 ## 烧录顺序
 
@@ -176,3 +179,24 @@ hello from LocationGET
 ```text
 firmware\patches\ble-uart-send-hello-on-notify.patch
 ```
+
+## 下一步固件协议
+
+第 5 关进入资产标签控制协议。先继续使用 nRF Connect 手动写入 BLE UART RX characteristic 验证设备端，再开发 Android App。
+
+手机写入命令：
+
+```text
+FIND_ON
+FIND_OFF
+STATUS?
+```
+
+板子 Notify 返回：
+
+```text
+id=L4-001,bat=100,state=normal
+id=L4-001,bat=100,state=finding
+```
+
+第一阶段 `bat=100` 是占位数据。真实电量需要后续确认供电方式、电池分压和 ADC 采样方案。

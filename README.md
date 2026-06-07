@@ -1,8 +1,8 @@
 # LocationGET
 
-Ebyte E73-2G4M04S1A / nRF52810 location prototype.
+Ebyte E73-2G4M04S1A / nRF52810 BLE warehouse asset tag prototype.
 
-目标是先做一个可验证的蓝牙定位样机：E73-2G4M04S1A 模块运行 nRF52810 固件，后续接 GPS 模块，通过 BLE UART 把坐标字符串发到手机。初期不用正式 App，先用 nRF Connect 验证。
+目标是做一个接近真实仓库管理场景的 BLE 资产标签系统：E73-2G4M04S1A 模块运行 nRF52810 固件，作为可扫描、可连接、可声光查找的资产标签；手机端扫描标签、显示 RSSI 远近、记录最后出现状态，并通过 BLE 命令控制标签 LED/蜂鸣器。
 
 ## 当前硬件
 
@@ -13,7 +13,7 @@ Ebyte E73-2G4M04S1A / nRF52810 location prototype.
 - 手机验证工具：nRF Connect for Mobile
 - 固件工程基准：Nordic SDK 的 `pca10040e` 示例
 
-注意：`pca10040e` 是 Nordic SDK 为 nRF52810 提供的示例配置，不代表本项目使用 Nordic PCA10040E 开发板。E73 是模块，LED、按键、GPS UART、供电和 SWD 都要按自己的底板接线确认。
+注意：`pca10040e` 是 Nordic SDK 为 nRF52810 提供的示例配置，不代表本项目使用 Nordic PCA10040E 开发板。E73 是模块，LED、按键、蜂鸣器、供电和 SWD 都要按自己的底板接线确认。
 
 ## 本地 SDK 准备
 
@@ -116,26 +116,26 @@ ble_nus_data_send(&m_nus, data_array, &length, m_conn_handle);
 
 本关完成标准：手机能看到设备广播，连接后能看到从固件发来的测试字符串。
 
-### 第 5 关：GPS 坐标上报
+### 第 5 关：资产标签控制协议
 
-目标：GPS 模块输出 NMEA，nRF52810 解析 `$GPRMC` 或 `$GNRMC`，通过 BLE UART 发坐标字符串到手机。
+目标：把 BLE UART 示例升级成仓库资产标签控制协议。先用 nRF Connect 替代正式 App 验证命令，再开发 Android App。
 
-接线原则：
-
-```text
-GPS_TX -> nRF52810_RX
-GPS_RX -> nRF52810_TX
-GPS_GND -> nRF52810_GND
-GPS_VCC -> 确认电压兼容
-```
-
-第一版只发送文本：
+第一版设备命令：
 
 ```text
-lat=22.54321,lng=113.98765
+FIND_ON   -> 标签进入查找状态，LED 闪烁，后续蜂鸣器响
+FIND_OFF  -> 标签退出查找状态，LED/蜂鸣器停止
+STATUS?   -> 标签返回资产状态
 ```
 
-本关完成标准：手机 nRF Connect 中能看到稳定更新的经纬度字符串。
+第一版返回格式：
+
+```text
+id=L4-001,bat=100,state=normal
+id=L4-001,bat=100,state=finding
+```
+
+本关完成标准：手机 nRF Connect 能手动发送 `FIND_ON` / `FIND_OFF` / `STATUS?`，板子能控制 P0.17/P0.18 并返回状态。后续 Android App 将把这些手动动作做成资产扫描、详情和查找界面。
 
 ## 建议时间周期
 
@@ -145,10 +145,11 @@ lat=22.54321,lng=113.98765
 | 第 2 关 | SWD 烧录 | 0.5-1 天 | 能 erase/program/reset |
 | 第 3 关 | GPIO 运行证明 | 0.5-1 天 | LED/GPIO/RTT 可观察 |
 | 第 4 关 | BLE UART | 1-3 天 | 手机连接并收发文本 |
-| 第 5 关 | GPS 坐标 | 2-5 天 | 手机看到坐标字符串 |
+| 第 5 关 | 资产标签控制协议 | 1-2 天 | nRF Connect 能控制 LED/蜂鸣器并读取状态 |
+| 第 6 关 | Android App MVP | 2-3 天 | App 扫描 L4 标签、显示 RSSI、连接并查找 |
 | 整理复盘 | 文档和问题记录 | 持续 | README/docs 同步更新 |
 
-如果硬件接线、下载器或 GPS 供电不确定，时间会主要花在第 2、3、5 关。
+如果硬件接线、下载器或蜂鸣器驱动不确定，时间会主要花在第 2、3、5 关。
 
 ## 推荐先读什么
 
@@ -156,8 +157,9 @@ lat=22.54321,lng=113.98765
 
 1. 做第 1-3 关时读：nRF52810 / `pca10040e` 说明，理解为什么不是 `pca10040`。
 2. 做第 4 关时读：nRF5 SDK BLE UART/NUS 示例文档。
-3. 做第 5 关时读：GPS 模块手册中的 UART、电平、波特率、NMEA `$GPRMC`/`$GNRMC`。
-4. BLE 概念不懂时，再看 Nordic Academy BLE Fundamentals。该课程偏 nRF Connect SDK/Zephyr，概念可学，代码不要直接照搬到 nRF5 SDK。
+3. 做第 5 关时读：nRF5 SDK BLE NUS 示例、GPIO/GPIOTE、按键输入和 PWM 基础。
+4. 做第 6 关时读：Android BLE 扫描、连接、GATT characteristic 写入、RSSI 读取和运行时权限。
+5. BLE 概念不懂时，再看 Nordic Academy BLE Fundamentals。该课程偏 nRF Connect SDK/Zephyr，概念可学，代码不要直接照搬到 nRF5 SDK。
 
 详细链接见 [docs/references.md](docs/references.md)。
 
