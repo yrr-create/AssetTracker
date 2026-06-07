@@ -85,6 +85,7 @@ firmware\patches\blinky-ewt73-p017-p018.patch
 
 - 进入第 4 关：基于 `ble_app_uart_pca10040e_s112.emProject` 做 BLE UART。
 - 目标是手机 nRF Connect 能扫描到设备、连接设备，并收到固件发出的测试字符串。
+- BLE UART 烧录必须先烧 S112 SoftDevice，再烧 application；它和前面的 blinky `blank` 工程不一样。
 
 ## 进度模板
 

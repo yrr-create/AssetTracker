@@ -78,6 +78,31 @@ BLE UART 阶段需要：
 
 亮灯 `blank` 阶段不需要 SoftDevice。
 
+原因：
+
+```text
+S112 SoftDevice      = Nordic BLE 协议栈，负责广播、连接、GATT/ATT 和 radio 调度
+BLE UART application = 本项目应用，负责设备名、NUS 服务和数据收发逻辑
+```
+
+`ble_app_uart_pca10040e_s112` 不是裸机 `blank` 程序。它会调用 SoftDevice API，例如：
+
+```c
+nrf_sdh_enable_request();
+sd_ble_gap_device_name_set();
+sd_ble_gap_adv_start();
+ble_nus_init();
+```
+
+因此 Flash 中必须先存在 S112。该工程的典型内存布局是：
+
+```text
+0x00000  -> S112 SoftDevice
+0x19000  -> BLE UART application
+```
+
+如果只烧 application，不烧 S112，BLE 程序会启动失败或进入错误处理。前面的 blinky `blank` 工程只控制 GPIO，所以不需要 SoftDevice。
+
 ## 已验证的 GPIO 试验
 
 2026-06-07 已确认 EWT73 板上 `P0.17` 和 `P0.18` 可由固件交替控制。
