@@ -87,6 +87,42 @@ firmware\patches\blinky-ewt73-p017-p018.patch
 - 目标是手机 nRF Connect 能扫描到设备、连接设备，并收到固件发出的测试字符串。
 - BLE UART 烧录必须先烧 S112 SoftDevice，再烧 application；它和前面的 blinky `blank` 工程不一样。
 
+### 第 4 关 BLE UART 验证
+
+- 手机 nRF Connect 已扫描到 `Nordic_UART`。
+- 手机已连接成功，状态显示 `CONNECTED`。
+- 已发现 `Nordic UART Service`：
+
+```text
+UUID: 6e400001-b5a3-f393-e0a9-e50e24dcca9e
+```
+
+- 已确认两个 characteristic：
+
+```text
+6e400002-b5a3-f393-e0a9-e50e24dcca9e  手机 -> 板子，Write/RX
+6e400003-b5a3-f393-e0a9-e50e24dcca9e  板子 -> 手机，Notify/TX
+```
+
+- 在 `nus_data_handler()` 中处理 `BLE_NUS_EVT_COMM_STARTED`，手机开启 Notify 后，板子主动发送：
+
+```text
+hello from LocationGET
+```
+
+- 手机已收到该字符串，说明 BLE UART 的板子到手机方向已跑通。
+
+仓库中保存了对应 patch：
+
+```text
+firmware\patches\ble-uart-send-hello-on-notify.patch
+```
+
+### 下一步
+
+- 将设备名从 `Nordic_UART` 改成项目名，例如 `LocationGET`。
+- 再做周期性发送测试字符串，为后续 GPS 坐标上报做准备。
+
 ## 进度模板
 
 ### YYYY-MM-DD

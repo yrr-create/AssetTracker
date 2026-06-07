@@ -142,3 +142,37 @@ firmware\patches\ble-uart-ses828-compat.patch
 ```text
 docs\troubleshooting.md
 ```
+
+## BLE UART hello 发送试验
+
+2026-06-07 已验证手机开启 `6e400003-b5a3-f393-e0a9-e50e24dcca9e` Notify 后，板子可通过 `ble_nus_data_send()` 主动发送文本到手机。
+
+关键位置：
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\main.c
+```
+
+关键事件：
+
+```c
+BLE_NUS_EVT_COMM_STARTED
+```
+
+该事件表示手机已经开启 NUS TX characteristic 的 Notify。此时发送：
+
+```c
+ble_nus_data_send(&m_nus, hello, &length, m_conn_handle);
+```
+
+手机已收到：
+
+```text
+hello from LocationGET
+```
+
+仓库中保存了对应 patch：
+
+```text
+firmware\patches\ble-uart-send-hello-on-notify.patch
+```

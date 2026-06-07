@@ -1,0 +1,19 @@
+diff --git a/examples/ble_peripheral/ble_app_uart/main.c b/examples/ble_peripheral/ble_app_uart/main.c
+--- a/examples/ble_peripheral/ble_app_uart/main.c
++++ b/examples/ble_peripheral/ble_app_uart/main.c
+@@
+ static void nus_data_handler(ble_nus_evt_t * p_evt)
+ {
+-    if (p_evt->type == BLE_NUS_EVT_RX_DATA)
++    if (p_evt->type == BLE_NUS_EVT_COMM_STARTED)
++    {
++        uint32_t err_code;
++        uint8_t hello[] = "hello from LocationGET\r\n";
++        uint16_t length = sizeof(hello) - 1;
++
++        err_code = ble_nus_data_send(&m_nus, hello, &length, m_conn_handle);
++        APP_ERROR_CHECK(err_code);
++    }
++    else if (p_evt->type == BLE_NUS_EVT_RX_DATA)
+     {
+         uint32_t err_code;
