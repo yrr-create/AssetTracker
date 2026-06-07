@@ -89,6 +89,94 @@ Output\Debug\Exe\blinky_pca10040e.hex
 Output\Debug\Exe\blinky_pca10040e.map
 ```
 
+### 5. SES 8.28 编译 BLE UART / S112 的兼容问题
+
+日期：2026-06-07
+
+阶段：第 4 关 BLE UART
+
+工程：
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\pca10040e\s112\ses\ble_app_uart_pca10040e_s112.emProject
+```
+
+注意：该 SES 工程只有 `Common` 和 `Release` 配置，没有 `Debug` 配置。命令行构建应使用：
+
+```powershell
+& "C:\Program Files\SEGGER\SEGGER Embedded Studio 8.28\bin\emBuild.exe" -config Release -rebuild "...\ble_app_uart_pca10040e_s112.emProject"
+```
+
+#### 问题 A：`.text/.rodata section is larger than specified size`
+
+原因与 blinky 相同，`ses\flash_placement.xml` 中 `.text` 和 `.rodata` 被旧工程写成了 `size="0x4"`，在 SES 8.28 下会变成错误的小节大小限制。
+
+处理方式：
+
+```xml
+<ProgramSection alignment="4" load="Yes" name=".text" />
+<ProgramSection alignment="4" load="Yes" name=".rodata" />
+```
+
+不要删除 `FLASH_SIZE=0x17000` 或 `FLASH_PH_SIZE=0x30000`，这些是 S112 + nRF52810 的内存布局。
+
+#### 问题 B：`unknown type name '__printf_tag_ptr'`
+
+原始错误：
+
+```text
+components\libraries\uart\retarget.c:101:23: error: unknown type name '__printf_tag_ptr'
+int __putchar(int ch, __printf_tag_ptr tag_ptr)
+```
+
+原因：
+
+- nRF5 SDK 17.1.0 的 `retarget.c` 用 `__SES_VERSION >= 34000` 判断是否使用 `__printf_tag_ptr`。
+- SES 8.28 的 `__SES_VERSION` 也满足该条件，但 SES 8.28 的头文件中不再提供这个类型。
+
+当前处理方式：
+
+```c
+#if defined(__SES_VERSION) && (__SES_VERSION >= 34000) && (__SES_VERSION < 80000)
+```
+
+让 SES 8.x 不走 `__printf_tag_ptr` 分支。
+
+#### 问题 C：`undefined reference to stdout`
+
+原始错误：
+
+```text
+undefined reference to `stdout'
+undefined reference to `__SEGGER_RTL_X_file_write'
+```
+
+原因：
+
+- BLE UART 示例中的 `printf("\r\nUART started.\r\n");` 会拉入 SES 8 的标准输出文件系统符号。
+- 第 4 关当前目标是先跑 BLE 广播和连接，不需要这句标准输出打印。
+
+当前处理方式：
+
+```c
+// 删除 main.c 中的这一句
+printf("\r\nUART started.\r\n");
+```
+
+验证结果：
+
+```text
+ble_app_uart_pca10040e_s112.elf
+ble_app_uart_pca10040e_s112.hex
+ble_app_uart_pca10040e_s112.map
+```
+
+仓库中保存了对应 patch：
+
+```text
+firmware\patches\ble-uart-ses828-compat.patch
+```
+
 ## 新问题记录模板
 
 ### 标题

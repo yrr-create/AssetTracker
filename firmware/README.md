@@ -93,3 +93,27 @@ G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\peripheral\blink
 ```text
 firmware\patches\blinky-ewt73-p017-p018.patch
 ```
+
+## BLE UART / SES 8.28 兼容补丁
+
+2026-06-07 已确认 BLE UART / S112 示例在 SEGGER Embedded Studio 8.28 下需要本地兼容处理后才能编译。
+
+本机已修改：
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\pca10040e\s112\ses\flash_placement.xml
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\components\libraries\uart\retarget.c
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\main.c
+```
+
+仓库中保存了对应 patch：
+
+```text
+firmware\patches\ble-uart-ses828-compat.patch
+```
+
+详细原因和错误原文见：
+
+```text
+docs\troubleshooting.md
+```

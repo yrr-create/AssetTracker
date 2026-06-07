@@ -1,0 +1,24 @@
+diff --git a/components/libraries/uart/retarget.c b/components/libraries/uart/retarget.c
+--- a/components/libraries/uart/retarget.c
++++ b/components/libraries/uart/retarget.c
+@@
+-#if defined(__SES_VERSION) && (__SES_VERSION >= 34000)
++#if defined(__SES_VERSION) && (__SES_VERSION >= 34000) && (__SES_VERSION < 80000)
+ int __putchar(int ch, __printf_tag_ptr tag_ptr)
+ {
+     UNUSED_PARAMETER(tag_ptr);
+diff --git a/examples/ble_peripheral/ble_app_uart/main.c b/examples/ble_peripheral/ble_app_uart/main.c
+--- a/examples/ble_peripheral/ble_app_uart/main.c
++++ b/examples/ble_peripheral/ble_app_uart/main.c
+@@
+-    printf("\r\nUART started.\r\n");
+     NRF_LOG_INFO("Debug logging for UART over RTT started.");
+diff --git a/examples/ble_peripheral/ble_app_uart/pca10040e/s112/ses/flash_placement.xml b/examples/ble_peripheral/ble_app_uart/pca10040e/s112/ses/flash_placement.xml
+--- a/examples/ble_peripheral/ble_app_uart/pca10040e/s112/ses/flash_placement.xml
++++ b/examples/ble_peripheral/ble_app_uart/pca10040e/s112/ses/flash_placement.xml
+@@
+-    <ProgramSection alignment="4" load="Yes" name=".text" size="0x4" />
++    <ProgramSection alignment="4" load="Yes" name=".text" />
+@@
+-    <ProgramSection alignment="4" load="Yes" name=".rodata" size="0x4" />
++    <ProgramSection alignment="4" load="Yes" name=".rodata" />
