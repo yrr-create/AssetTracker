@@ -1,0 +1,127 @@
+diff --git a/examples/ble_peripheral/ble_app_uart/main.c b/examples/ble_peripheral/ble_app_uart/main.c
+--- a/examples/ble_peripheral/ble_app_uart/main.c
++++ b/examples/ble_peripheral/ble_app_uart/main.c
+@@
+ #include "bsp_btn_ble.h"
+ #include "nrf_pwr_mgmt.h"
++#include "nrf_gpio.h"
++#include "nrf_delay.h"
+@@
+ #define UART_TX_BUF_SIZE                256                                         /**< UART TX buffer size. */
+ #define UART_RX_BUF_SIZE                256                                         /**< UART RX buffer size. */
++#define L4_ASSET_ID                     "L4-001"
++#define L4_STATUS_LED_PIN               17
++#define L4_FIND_LED_PIN                 18
++#define L4_FIND_BLINK_MS                150
+@@
+ static ble_uuid_t m_adv_uuids[]          =                                          /**< Universally unique service identifier. */
+ {
+     {BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}
+ };
++static bool m_l4_finding = false;
++
++static void l4_leds_init(void)
++{
++    nrf_gpio_cfg_output(L4_STATUS_LED_PIN);
++    nrf_gpio_cfg_output(L4_FIND_LED_PIN);
++
++    nrf_gpio_pin_set(L4_STATUS_LED_PIN);
++    nrf_gpio_pin_set(L4_FIND_LED_PIN);
++}
++
++static void l4_set_finding(bool finding)
++{
++    m_l4_finding = finding;
++
++    if (!m_l4_finding)
++    {
++        nrf_gpio_pin_set(L4_FIND_LED_PIN);
++    }
++}
++
++static void l4_finding_process(void)
++{
++    if (m_l4_finding)
++    {
++        nrf_gpio_pin_toggle(L4_FIND_LED_PIN);
++        nrf_delay_ms(L4_FIND_BLINK_MS);
++    }
++}
++
++static void l4_send_status(void)
++{
++    uint32_t err_code;
++    uint8_t normal_status[]  = "id=L4-001,bat=100,state=normal\r\n";
++    uint8_t finding_status[] = "id=L4-001,bat=100,state=finding\r\n";
++    uint8_t * p_status       = m_l4_finding ? finding_status : normal_status;
++    uint16_t length          = (uint16_t)strlen((char *)p_status);
++
++    err_code = ble_nus_data_send(&m_nus, p_status, &length, m_conn_handle);
++    if ((err_code != NRF_ERROR_INVALID_STATE) &&
++        (err_code != NRF_ERROR_RESOURCES) &&
++        (err_code != NRF_ERROR_NOT_FOUND))
++    {
++        APP_ERROR_CHECK(err_code);
++    }
++}
++
++static bool l4_command_equals(ble_nus_evt_t * p_evt, char const * p_command)
++{
++    uint16_t rx_len = p_evt->params.rx_data.length;
++    uint8_t const * p_data = p_evt->params.rx_data.p_data;
++    size_t command_len = strlen(p_command);
++
++    while ((rx_len > 0) &&
++           ((p_data[rx_len - 1] == '\r') || (p_data[rx_len - 1] == '\n')))
++    {
++        rx_len--;
++    }
++
++    return (rx_len == command_len) &&
++           (memcmp(p_data, p_command, command_len) == 0);
++}
+@@
+     else if (p_evt->type == BLE_NUS_EVT_RX_DATA)
+     {
+         uint32_t err_code;
++
++        if (l4_command_equals(p_evt, "FIND_ON"))
++        {
++            l4_set_finding(true);
++            l4_send_status();
++            return;
++        }
++
++        if (l4_command_equals(p_evt, "FIND_OFF"))
++        {
++            l4_set_finding(false);
++            l4_send_status();
++            return;
++        }
++
++        if (l4_command_equals(p_evt, "STATUS?"))
++        {
++            l4_send_status();
++            return;
++        }
+@@
+     uart_init();
+     log_init();
+     timers_init();
+     buttons_leds_init(&erase_bonds);
++    l4_leds_init();
+     power_management_init();
+@@
+     for (;;)
+     {
+-        idle_state_handle();
++        if (m_l4_finding)
++        {
++            l4_finding_process();
++        }
++        else
++        {
++            idle_state_handle();
++        }
+     }
+ }

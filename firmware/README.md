@@ -200,3 +200,39 @@ id=L4-001,bat=100,state=finding
 ```
 
 第一阶段 `bat=100` 是占位数据。真实电量需要后续确认供电方式、电池分压和 ADC 采样方案。
+
+## BLE UART 资产标签命令
+
+2026-06-10 已验证第 5 关核心命令：
+
+```text
+FIND_ON
+FIND_OFF
+STATUS?
+```
+
+手机通过 NUS RX characteristic 写入命令，板子通过 NUS TX Notify 返回：
+
+```text
+id=L4-001,bat=100,state=finding
+id=L4-001,bat=100,state=normal
+```
+
+本机 SDK 修改位置：
+
+```text
+G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\main.c
+```
+
+本次硬件观察：
+
+- `PWR` 是电源指示灯，不受固件控制。
+- `P0.17` 作为状态灯预留。
+- `P0.18` 作为查找灯。
+- 当前底板 LED 是低电平亮，高电平灭，因此 `nrf_gpio_pin_set(L4_FIND_LED_PIN)` 才是关闭查找灯。
+
+仓库中保存了对应 patch：
+
+```text
+firmware\patches\ble-uart-asset-tag-commands.patch
+```

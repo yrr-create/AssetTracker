@@ -158,6 +158,44 @@ App 能读取 STATUS 状态
 docs\superpowers\specs\2026-06-07-ble-warehouse-asset-tag-mvp-design.md
 ```
 
+## 2026-06-10
+
+### 做了什么
+
+- 在 BLE UART 示例中加入资产标签命令解析。
+- 用 nRF Connect 向 NUS RX characteristic 写入 `FIND_ON` / `FIND_OFF` / `STATUS?`。
+- 使用 NUS TX Notify 返回资产状态。
+- 使用 `P0.18` 作为查找灯，确认当前底板 LED 为低电平亮。
+
+### 结果
+
+手机已验证：
+
+```text
+FIND_ON  -> id=L4-001,bat=100,state=finding
+FIND_OFF -> id=L4-001,bat=100,state=normal
+STATUS?  -> 返回当前 state
+```
+
+硬件已验证：
+
+```text
+PWR  = 电源指示灯，不由固件控制
+P0.17 = 状态灯预留
+P0.18 = 查找灯，FIND_ON 闪烁，FIND_OFF 熄灭
+```
+
+### 遇到的问题
+
+- 一开始 `FIND_OFF` 后 P0.18 仍然亮。原因是底板 LED 是低电平亮，高电平灭。
+- `idle_state_handle()` 会让芯片进入电源管理空闲状态；查找状态下如果每轮都进入 idle，P0.18 不能连续闪烁。当前主循环改为 finding 状态下执行 `l4_finding_process()`，非 finding 状态才进入 idle。
+
+### 下一步
+
+- 把手机开启 Notify 后的初始 hello 文本改成 `l4_send_status()`。
+- 确认板载按钮对应 GPIO，并实现按钮停止查找。
+- 连接无源蜂鸣器，用 PWM 实现查找声音。
+
 ## 进度模板
 
 ### YYYY-MM-DD
