@@ -196,6 +196,32 @@ P0.18 = 查找灯，FIND_ON 闪烁，FIND_OFF 熄灭
 - 确认板载按钮对应 GPIO，并实现按钮停止查找。
 - 连接无源蜂鸣器，用 PWM 实现查找声音。
 
+## 2026-06-14
+
+### 做了什么
+
+- 加入临时 GPIO 扫描函数，用 nRF Connect Notify 观察板载按键对应 GPIO。
+- 第一轮候选 GPIO 无反应后，扩大扫描范围，避开 UART、LED、RESET 和 SWD 相关引脚。
+
+### 结果
+
+当前实测输出：
+
+```text
+SW1: button=P0.14
+SW2: button=P0.13
+```
+
+### 遇到的问题
+
+- Nordic SDK 默认 BSP 按键映射不适配当前 EWT73 测试板，`normal` 和 `finding` 状态下按 SW1/SW2 都不会自动触发业务逻辑。
+- normal 状态下如果主循环进入 `idle_state_handle()`，轮询式按钮扫描不会连续运行；按钮 GPIO 识别阶段临时改为非低功耗轮询。
+
+### 下一步
+
+- 把临时扫描代码改成正式按键逻辑：按下用户按键时执行 `l4_set_finding(false)` 并 `l4_send_status()`。
+- 确认后保存新的固件 patch。
+
 ## 进度模板
 
 ### YYYY-MM-DD
