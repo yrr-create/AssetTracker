@@ -1,0 +1,60 @@
+diff --git a/examples/ble_peripheral/ble_app_uart/main.c b/examples/ble_peripheral/ble_app_uart/main.c
+--- a/examples/ble_peripheral/ble_app_uart/main.c
++++ b/examples/ble_peripheral/ble_app_uart/main.c
+@@
+ #define L4_FIND_LED_PIN                 18
+ #define L4_FIND_BLINK_MS                150
++
++#define L4_BUZZER_PIN                   15
++#define L4_BUZZER_TEST_MS               1000
+@@
++static void l4_buzzer_init(void)
++{
++    nrf_gpio_cfg_output(L4_BUZZER_PIN);
++    nrf_gpio_pin_clear(L4_BUZZER_PIN);
++}
++
++static void l4_buzzer_test_beep(void)
++{
++    uint32_t cycles = L4_BUZZER_TEST_MS * 4;
++
++    for (uint32_t i = 0; i < cycles; i++)
++    {
++        nrf_gpio_pin_set(L4_BUZZER_PIN);
++        nrf_delay_us(125);
++        nrf_gpio_pin_clear(L4_BUZZER_PIN);
++        nrf_delay_us(125);
++    }
++}
++
++static void l4_buzzer_find_pattern(void)
++{
++    for (uint32_t i = 0; i < 600; i++)
++    {
++        nrf_gpio_pin_set(L4_BUZZER_PIN);
++        nrf_delay_us(125);
++        nrf_gpio_pin_clear(L4_BUZZER_PIN);
++        nrf_delay_us(125);
++    }
++}
++
+ static void l4_set_finding(bool finding)
+ {
+     m_l4_finding = finding;
+@@
+     if (m_l4_finding)
+     {
+         nrf_gpio_pin_toggle(L4_FIND_LED_PIN);
++        l4_buzzer_find_pattern();
+         nrf_delay_ms(L4_FIND_BLINK_MS);
+     }
+ }
+@@
+     buttons_leds_init(&erase_bonds);
+     l4_leds_init();
+     l4_buttons_init();
++
++    l4_buzzer_init();
++    /* l4_buzzer_test_beep(); */ /* Bring-up only: enabled once to prove P0.15 and buzzer wiring. */
+ 
+     power_management_init();
