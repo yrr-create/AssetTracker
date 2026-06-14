@@ -1,0 +1,53 @@
+diff --git a/examples/ble_peripheral/ble_app_uart/main.c b/examples/ble_peripheral/ble_app_uart/main.c
+--- a/examples/ble_peripheral/ble_app_uart/main.c
++++ b/examples/ble_peripheral/ble_app_uart/main.c
+@@
+-#define L4_BUZZER_TEST_MS               1000
+@@
+-static const uint8_t m_l4_button_test_pins[] =
+-{
+-    2, 3, 4, 5, 7, 9, 10,
+-    11, 12, 13, 14, 15, 16,
+-    19, 20, 22, 23, 24
+-};
+-
+-static uint32_t m_l4_last_button_mask = 0;
+@@
+-static void l4_button_scan_init(void)
+-{
+-    /* Temporary GPIO scan helper used only to discover SW1/SW2 pins. */
+-}
+-
+-static void l4_buzzer_test_beep(void)
+-{
+-    /* Bring-up helper used only to prove P0.15 and buzzer wiring. */
+-}
+-
+-static void l4_send_button(uint8_t pin)
+-{
+-    /* Temporary Notify helper used only during GPIO scan. */
+-}
+-
+-static void l4_button_scan_process(void)
+-{
+-    /* Temporary GPIO scan loop. */
+-}
+@@
+     if (!m_l4_finding)
+     {
+         nrf_gpio_pin_set(L4_FIND_LED_PIN);
++        nrf_gpio_pin_clear(L4_BUZZER_PIN);
+     }
+@@
+     buttons_leds_init(&erase_bonds);
+     l4_leds_init();
+-    //l4_button_scan_init();
+     l4_buttons_init();
+ 
+     l4_buzzer_init();
+-    //l4_buzzer_test_beep();
+@@
+     for (;;)
+     {
+-        //l4_button_scan_process();
+         l4_buttons_process();

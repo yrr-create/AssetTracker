@@ -85,21 +85,21 @@ diff --git a/examples/ble_peripheral/ble_app_uart/main.c b/examples/ble_peripher
      {
          uint32_t err_code;
 +
-+        if (l4_command_equals(p_evt, "FIND_ON"))
++        if (l4_command_equals(p_evt, "findon"))
 +        {
 +            l4_set_finding(true);
 +            l4_send_status();
 +            return;
 +        }
 +
-+        if (l4_command_equals(p_evt, "FIND_OFF"))
++        if (l4_command_equals(p_evt, "findoff"))
 +        {
 +            l4_set_finding(false);
 +            l4_send_status();
 +            return;
 +        }
 +
-+        if (l4_command_equals(p_evt, "STATUS?"))
++        if (l4_command_equals(p_evt, "s?"))
 +        {
 +            l4_send_status();
 +            return;

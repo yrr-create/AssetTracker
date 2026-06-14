@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Turn the validated BLE UART example into a controllable warehouse asset tag firmware that accepts `FIND_ON`, `FIND_OFF`, and `STATUS?`.
+**Goal:** Turn the validated BLE UART example into a controllable warehouse asset tag firmware that accepts `findon`, `findoff`, and `s?`.
 
 **Architecture:** Keep using the Nordic SDK BLE UART / NUS example as the control channel. Add a small asset-tag command layer inside `main.c`: command comparison, finding state, LED control, and status notifications. Do not create a custom GATT service yet; nRF Connect remains the test client.
 
@@ -171,7 +171,7 @@ Expected result:
 Build complete
 ```
 
-## Task 3: Parse FIND_ON, FIND_OFF, and STATUS?
+## Task 3: Parse findon, findoff, and s?
 
 **Files:**
 - Modify: `G:\Personalportfolio\NordicSDK\nRF5_SDK_17.1.0_ddde560\examples\ble_peripheral\ble_app_uart\main.c`
@@ -211,21 +211,21 @@ In `nus_data_handler()`, find:
 Add this block immediately after `uint32_t err_code;`:
 
 ```c
-        if (l4_command_equals(p_evt, "FIND_ON"))
+        if (l4_command_equals(p_evt, "findon"))
         {
             l4_set_finding(true);
             l4_send_status();
             return;
         }
 
-        if (l4_command_equals(p_evt, "FIND_OFF"))
+        if (l4_command_equals(p_evt, "findoff"))
         {
             l4_set_finding(false);
             l4_send_status();
             return;
         }
 
-        if (l4_command_equals(p_evt, "STATUS?"))
+        if (l4_command_equals(p_evt, "s?"))
         {
             l4_send_status();
             return;
@@ -342,7 +342,7 @@ id=L4-001,bat=100,state=normal
 5. Write this to NUS RX:
 
 ```text
-FIND_ON
+findon
 ```
 
 Expected:
@@ -356,7 +356,7 @@ P0.18 blinks.
 6. Write this to NUS RX:
 
 ```text
-FIND_OFF
+findoff
 ```
 
 Expected:
@@ -370,7 +370,7 @@ P0.18 stops.
 7. Write this to NUS RX:
 
 ```text
-STATUS?
+s?
 ```
 
 Expected:
@@ -403,7 +403,7 @@ Append a dated section to `G:\Personalportfolio\LocationGET\docs\progress.md` wi
 
 ```text
 2026-06-08
-- Implemented FIND_ON / FIND_OFF / STATUS? protocol.
+- Implemented findon / findoff / s? protocol.
 - Verified nRF Connect can control L4-001.
 - Verified P0.18 finding LED behavior.
 - Next: confirm button GPIO and prepare passive buzzer PWM.
@@ -431,9 +431,9 @@ main -> main
 Spec coverage:
 
 - BLE tag name: covered by existing `DEVICE_NAME "L4-001"` and nRF Connect verification.
-- `FIND_ON`: Task 3 command parsing and Task 4 LED blinking.
-- `FIND_OFF`: Task 3 command parsing and LED stop behavior.
-- `STATUS?`: Task 2 status notification and Task 3 command parsing.
+- `findon`: Task 3 command parsing and Task 4 LED blinking.
+- `findoff`: Task 3 command parsing and LED stop behavior.
+- `s?`: Task 2 status notification and Task 3 command parsing.
 - P0.17/P0.18 first: Task 1 and Task 4.
 - Button and passive buzzer: intentionally deferred until GPIO/wiring is confirmed.
 

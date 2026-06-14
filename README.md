@@ -123,9 +123,9 @@ ble_nus_data_send(&m_nus, data_array, &length, m_conn_handle);
 第一版设备命令：
 
 ```text
-FIND_ON   -> 标签进入查找状态，LED 闪烁，后续蜂鸣器响
-FIND_OFF  -> 标签退出查找状态，LED/蜂鸣器停止
-STATUS?   -> 标签返回资产状态
+findon   -> 标签进入查找状态，LED 闪烁，蜂鸣器响
+findoff  -> 标签退出查找状态，LED/蜂鸣器停止
+s?       -> 标签返回资产状态
 ```
 
 第一版返回格式：
@@ -135,7 +135,7 @@ id=L4-001,bat=100,state=normal
 id=L4-001,bat=100,state=finding
 ```
 
-本关完成标准：手机 nRF Connect 能手动发送 `FIND_ON` / `FIND_OFF` / `STATUS?`，板子能控制 P0.17/P0.18 并返回状态。后续 Android App 将把这些手动动作做成资产扫描、详情和查找界面。
+本关完成标准：手机 nRF Connect 能手动发送 `findon` / `findoff` / `s?`，板子能控制 P0.18 和蜂鸣器并返回状态。后续 Android App 将把这些手动动作做成资产扫描、详情和查找界面。
 
 ## 建议时间周期
 

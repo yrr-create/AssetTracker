@@ -13,9 +13,9 @@ The next completed version should demonstrate:
 - Phone scans BLE tags named `L4-*`.
 - The selected asset shows RSSI as near/middle/far.
 - Phone connects to `L4-001`.
-- Phone sends `FIND_ON`; the tag enters finding mode.
-- Phone sends `FIND_OFF` or the board button is pressed; the tag exits finding mode.
-- Phone sends `STATUS?`; the tag returns ID, battery placeholder, and current state.
+- Phone sends `findon`; the tag enters finding mode.
+- Phone sends `findoff` or the board button is pressed; the tag exits finding mode.
+- Phone sends `s?`; the tag returns ID, battery placeholder, and current state.
 - Documentation explains current hardware limits and next product steps.
 
 ## Hardware
@@ -38,9 +38,9 @@ BLE UART / Nordic UART Service remains the first control channel because it has 
 Commands sent from phone to tag:
 
 ```text
-FIND_ON
-FIND_OFF
-STATUS?
+findon
+findoff
+s?
 ```
 
 Notifications sent from tag to phone:
@@ -60,7 +60,7 @@ nRF Connect is enough for protocol verification, but it cannot provide real asse
 - RSSI display and near/middle/far classification.
 - Last seen time and last seen area.
 - Asset binding such as `L4-001 -> Electric Drill -> Shelf A3`.
-- Find button that sends `FIND_ON` / `FIND_OFF`.
+- Find button that sends `findon` / `findoff`.
 - Inventory view showing found, missing, and low-battery assets.
 
 First Android version should be native Android rather than Flutter, because BLE permissions, scanning, connection, GATT write, and RSSI handling are more direct.
@@ -87,13 +87,13 @@ Day 1:
 
 Day 2:
 
-- Implement `FIND_ON` / `FIND_OFF` in `nus_data_handler()`.
+- Implement `findon` / `findoff` in `nus_data_handler()`.
 - Use P0.17/P0.18 for visual finding behavior.
 - Verify with nRF Connect.
 
 Day 3:
 
-- Implement `STATUS?`.
+- Implement `s?`.
 - Confirm board button GPIO.
 - Make button stop finding mode.
 
@@ -101,7 +101,7 @@ Day 4:
 
 - Connect passive buzzer safely.
 - Use PWM to generate sound.
-- Make `FIND_ON` trigger LED + buzzer.
+- Make `findon` trigger LED + buzzer.
 
 Day 5:
 
@@ -111,7 +111,7 @@ Day 5:
 Day 6:
 
 - Connect to selected tag.
-- Send `FIND_ON`, `FIND_OFF`, and `STATUS?`.
+- Send `findon`, `findoff`, and `s?`.
 - Show asset details and last seen data.
 
 Day 7:

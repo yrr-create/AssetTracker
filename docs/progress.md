@@ -121,7 +121,7 @@ firmware\patches\ble-uart-send-hello-on-notify.patch
 ### 下一步
 
 - 将设备名从 `Nordic_UART` 改成资产标签名，例如 `L4-001`。
-- 做 `FIND_ON` / `FIND_OFF` / `STATUS?`，为仓库资产查找功能做准备。
+- 做 `findon` / `findoff` / `s?`，为仓库资产查找功能做准备。
 
 ### 项目方向调整：BLE 仓库资产标签
 
@@ -163,7 +163,7 @@ docs\superpowers\specs\2026-06-07-ble-warehouse-asset-tag-mvp-design.md
 ### 做了什么
 
 - 在 BLE UART 示例中加入资产标签命令解析。
-- 用 nRF Connect 向 NUS RX characteristic 写入 `FIND_ON` / `FIND_OFF` / `STATUS?`。
+- 用 nRF Connect 向 NUS RX characteristic 写入 `findon` / `findoff` / `s?`。
 - 使用 NUS TX Notify 返回资产状态。
 - 使用 `P0.18` 作为查找灯，确认当前底板 LED 为低电平亮。
 
@@ -172,9 +172,9 @@ docs\superpowers\specs\2026-06-07-ble-warehouse-asset-tag-mvp-design.md
 手机已验证：
 
 ```text
-FIND_ON  -> id=L4-001,bat=100,state=finding
-FIND_OFF -> id=L4-001,bat=100,state=normal
-STATUS?  -> 返回当前 state
+findon  -> id=L4-001,bat=100,state=finding
+findoff -> id=L4-001,bat=100,state=normal
+s?      -> 返回当前 state
 ```
 
 硬件已验证：
@@ -182,12 +182,12 @@ STATUS?  -> 返回当前 state
 ```text
 PWR  = 电源指示灯，不由固件控制
 P0.17 = 状态灯预留
-P0.18 = 查找灯，FIND_ON 闪烁，FIND_OFF 熄灭
+P0.18 = 查找灯，findon 闪烁，findoff 熄灭
 ```
 
 ### 遇到的问题
 
-- 一开始 `FIND_OFF` 后 P0.18 仍然亮。原因是底板 LED 是低电平亮，高电平灭。
+- 一开始 `findoff` 后 P0.18 仍然亮。原因是底板 LED 是低电平亮，高电平灭。
 - `idle_state_handle()` 会让芯片进入电源管理空闲状态；查找状态下如果每轮都进入 idle，P0.18 不能连续闪烁。当前主循环改为 finding 状态下执行 `l4_finding_process()`，非 finding 状态才进入 idle。
 
 ### 下一步

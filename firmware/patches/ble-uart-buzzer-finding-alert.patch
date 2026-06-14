@@ -14,18 +14,6 @@ diff --git a/examples/ble_peripheral/ble_app_uart/main.c b/examples/ble_peripher
 +    nrf_gpio_pin_clear(L4_BUZZER_PIN);
 +}
 +
-+static void l4_buzzer_test_beep(void)
-+{
-+    uint32_t cycles = L4_BUZZER_TEST_MS * 4;
-+
-+    for (uint32_t i = 0; i < cycles; i++)
-+    {
-+        nrf_gpio_pin_set(L4_BUZZER_PIN);
-+        nrf_delay_us(125);
-+        nrf_gpio_pin_clear(L4_BUZZER_PIN);
-+        nrf_delay_us(125);
-+    }
-+}
 +
 +static void l4_buzzer_find_pattern(void)
 +{

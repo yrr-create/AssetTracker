@@ -62,9 +62,9 @@ firmware/location_tracker_nrf52810/
 
 1. 自定义设备名
 2. 固定测试字符串发送
-3. `FIND_ON` / `FIND_OFF` 命令解析
+3. `findon` / `findoff` 命令解析
 4. P0.17 / P0.18 查找灯控制
-5. `STATUS?` 状态返回
+5. `s?` 状态返回
 6. 板载按钮停止查找
 7. 无源蜂鸣器 PWM 发声
 
@@ -187,9 +187,9 @@ firmware\patches\ble-uart-send-hello-on-notify.patch
 手机写入命令：
 
 ```text
-FIND_ON
-FIND_OFF
-STATUS?
+findon
+findoff
+s?
 ```
 
 板子 Notify 返回：
@@ -206,9 +206,9 @@ id=L4-001,bat=100,state=finding
 2026-06-10 已验证第 5 关核心命令：
 
 ```text
-FIND_ON
-FIND_OFF
-STATUS?
+findon
+findoff
+s?
 ```
 
 手机通过 NUS RX characteristic 写入命令，板子通过 NUS TX Notify 返回：
