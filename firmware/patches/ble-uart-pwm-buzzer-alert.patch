@@ -1,0 +1,111 @@
+diff --git a/examples/ble_peripheral/ble_app_uart/main.c b/examples/ble_peripheral/ble_app_uart/main.c
+--- a/examples/ble_peripheral/ble_app_uart/main.c
++++ b/examples/ble_peripheral/ble_app_uart/main.c
+@@
+ #include "nrf_gpio.h"
+ #include "nrf_delay.h"
++#include "nrf_drv_pwm.h"
+@@
+ static bool m_l4_finding = false;
++
++static nrf_drv_pwm_t m_l4_pwm = NRF_DRV_PWM_INSTANCE(0);
++static nrf_pwm_values_common_t m_l4_buzzer_pwm_values[] = {250};
++
++static nrf_pwm_sequence_t const m_l4_buzzer_pwm_seq =
++{
++    .values.p_common = m_l4_buzzer_pwm_values,
++    .length          = NRF_PWM_VALUES_LENGTH(m_l4_buzzer_pwm_values),
++    .repeats         = 0,
++    .end_delay       = 0
++};
+@@
++static void l4_buzzer_pwm_init(void)
++{
++    nrf_drv_pwm_config_t const config =
++    {
++        .output_pins =
++        {
++            L4_BUZZER_PIN,
++            NRF_DRV_PWM_PIN_NOT_USED,
++            NRF_DRV_PWM_PIN_NOT_USED,
++            NRF_DRV_PWM_PIN_NOT_USED
++        },
++        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
++        .base_clock   = NRF_PWM_CLK_1MHz,
++        .count_mode   = NRF_PWM_MODE_UP,
++        .top_value    = 500,
++        .load_mode    = NRF_PWM_LOAD_COMMON,
++        .step_mode    = NRF_PWM_STEP_AUTO
++    };
++
++    ret_code_t err_code = nrf_drv_pwm_init(&m_l4_pwm, &config, NULL);
++    APP_ERROR_CHECK(err_code);
++}
++
++static void l4_buzzer_start(void)
++{
++    nrf_drv_pwm_simple_playback(&m_l4_pwm,
++                                &m_l4_buzzer_pwm_seq,
++                                1,
++                                NRF_DRV_PWM_FLAG_LOOP);
++}
++
++static void l4_buzzer_stop(void)
++{
++    nrf_drv_pwm_stop(&m_l4_pwm, true);
++    nrf_gpio_pin_clear(L4_BUZZER_PIN);
++}
+@@
+ static void l4_set_finding(bool finding)
+ {
++    if (m_l4_finding == finding)
++    {
++        return;
++    }
++
+     m_l4_finding = finding;
+     if (!m_l4_finding)
+     {
+         nrf_gpio_pin_set(L4_FIND_LED_PIN);
++        l4_buzzer_stop();
+     }
+ }
+@@
+     if (m_l4_finding)
+     {
+         nrf_gpio_pin_toggle(L4_FIND_LED_PIN);
+-        l4_buzzer_find_pattern();
+-        nrf_delay_ms(L4_FIND_BLINK_MS);
++        l4_buzzer_start();
++        nrf_delay_ms(150);
++        l4_buzzer_stop();
++        nrf_delay_ms(150);
+     }
+ }
+@@
+     l4_leds_init();
+     l4_buttons_init();
+-    l4_buzzer_init();
++    l4_buzzer_pwm_init();
+diff --git a/examples/ble_peripheral/ble_app_uart/pca10040e/s112/config/sdk_config.h b/examples/ble_peripheral/ble_app_uart/pca10040e/s112/config/sdk_config.h
+--- a/examples/ble_peripheral/ble_app_uart/pca10040e/s112/config/sdk_config.h
++++ b/examples/ble_peripheral/ble_app_uart/pca10040e/s112/config/sdk_config.h
+@@
+-#define NRFX_PWM_ENABLED 0
++#define NRFX_PWM_ENABLED 1
+@@
+-#define NRFX_PWM0_ENABLED 0
++#define NRFX_PWM0_ENABLED 1
+@@
+-#define PWM_ENABLED 0
++#define PWM_ENABLED 1
+@@
+-#define PWM0_ENABLED 0
++#define PWM0_ENABLED 1
+diff --git a/examples/ble_peripheral/ble_app_uart/pca10040e/s112/ses/ble_app_uart_pca10040e_s112.emProject b/examples/ble_peripheral/ble_app_uart/pca10040e/s112/ses/ble_app_uart_pca10040e_s112.emProject
+--- a/examples/ble_peripheral/ble_app_uart/pca10040e/s112/ses/ble_app_uart_pca10040e_s112.emProject
++++ b/examples/ble_peripheral/ble_app_uart/pca10040e/s112/ses/ble_app_uart_pca10040e_s112.emProject
+@@
+       <file file_name="../../../../../../modules/nrfx/drivers/src/prs/nrfx_prs.c" />
++      <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_pwm.c" />
+       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_uart.c" />
